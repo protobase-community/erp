@@ -1,17 +1,53 @@
-# ERP example database
+# ERP
 
-A real Postgres 18 database for the sample ERP: five module schemas plus one legacy schema, seeded deterministically with Dutch, German and English companies, EUR prices and three years of history (up to 2026-10-06).
+A sample ERP for small and medium companies: customers and contacts (CRM), a product catalog, sales orders and
+invoices, inventory across warehouses, and HR, for several organizations at once. It runs on a real Postgres 18
+database with five module schemas, seeded deterministically with Dutch, German and English companies, EUR prices and
+three years of history (up to 2026-10-06), so every screen has realistic data from the start.
 
-## Start
+## Use this template
+
+Press **Use this template** at the top of this page, then **Create a new repository**, to get your own copy with a
+clean history. Clone it and follow the setup below:
 
 ```sh
-bun run db:up                                    # repository root: docker compose up, waits until healthy; creates .env from .env.example
-bun run --cwd examples/erp db:migrate
-bun run --cwd examples/erp db:seed --scale small       # small | medium | large
-bun run --cwd examples/erp test                        # the unit tests next to the config and the seed
+git clone https://github.com/<you>/<your-repository>.git
+cd <your-repository>
 ```
 
-Other scripts: `db:seed:base` (the countries, the currencies and organization 1, named with `--name`: what an app made from the ERP preset starts with), `db:reset` (drop, migrate, seed small), `typecheck`. `bun run db:down` in the repository root stops the container; the `pgdata` volume stays, remove it with `docker compose down -v`. The database tests are the repository's `bun run test:integration`.
+## Setup
+
+You need [Bun](https://bun.sh) 1.4 and Docker.
+
+```sh
+bun install
+bun run db:up                     # Postgres 18 in Docker on port 55432; creates .env from .env.example
+bun run db:migrate
+bun run db:seed --scale small     # small | medium | large
+bun run protobase users create you@example.com --generate-password
+bun run dev                       # http://localhost:5173
+bun run test                      # the unit tests next to the config and the seed
+```
+
+Set your own `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`). The first user owns the seeded organizations;
+[Login](#login) says how others join.
+
+## Built with Protobase
+
+[Protobase](https://github.com/PrototeamHQ/protobase) builds the app from a Postgres database and a typed config: each table's data config sits in
+`config/<name>/data.ts` and its screens in `config/<name>/ui.ts`, all exported from `config/index.ts`, and
+`protobase dev` and `protobase serve` serve the API and the app from them.
+
+- Tested with Protobase **0.45.9**: the `@protobase/*` packages are pinned to it in `package.json`, and CI runs
+  against it. To upgrade, set the new version on each `@protobase/*` package, run `bun install`, then
+  `bun run typecheck`, `bun run test` and `bun run build`. The [release notes](https://github.com/PrototeamHQ/protobase/releases) say what changed.
+- Docs: [docs.protobase.net](https://docs.protobase.net). Source and issues: [PrototeamHQ/protobase](https://github.com/PrototeamHQ/protobase).
+- This app started as an example in Protobase's repository; its history came with it.
+- The same app is the `erp` preset that new Protobase apps can start from ([`@protobase/presets`](https://github.com/PrototeamHQ/protobase/tree/main/packages/presets)).
+
+## Database
+
+Other scripts: `db:seed:base` (the countries, the currencies and organization 1, named with `--name`: what an app made from the ERP preset starts with), `db:reset` (drop, migrate, seed small), `typecheck`. `bun run db:down` stops the container; the `pgdata` volume stays, remove it with `docker compose down -v`. The database tests run in [Protobase's repository](https://github.com/PrototeamHQ/protobase) (`bun run test:integration`).
 
 Connection string (port 55432 avoids a local Postgres on 5432):
 
@@ -50,12 +86,12 @@ Seed consistency: an invoice's subtotal equals the sum of its lines and an order
 
 - `db/migrations/NNN_name.sql`: plain SQL, applied in order and recorded in `public.schema_migrations` by `db/migrate.ts`.
 - `seed/`: `world.ts` allocates ids per organization, `builders/` rebuild a company, product or order from its ordinal alone, `steps/` stream one module each. `base.ts` is the base seed.
-- `AGENTS.md`: the rules for the assistant that changes an app made from this example, which is also the ERP preset (`packages/presets`; the preset leaves this README out).
-- `tests/postgres/erp-seed.test.ts` (in the repository root, in the Postgres suite): checks the medium seed's counts, invoice totals, stock levels, composite keys and `pg_stats`.
+- `AGENTS.md`: the rules for the assistant that changes an app made from this example, which is also the ERP preset ([`packages/presets`](https://github.com/PrototeamHQ/protobase/tree/main/packages/presets); the preset leaves this README out).
+- `tests/postgres/erp-seed.test.ts` in [Protobase's repository](https://github.com/PrototeamHQ/protobase) (in the Postgres suite): checks the medium seed's counts, invoice totals, stock levels, composite keys and `pg_stats`.
 
 ## Login
 
-`bun run --cwd examples/erp db:migrate` also creates Better Auth's tables in the `auth` schema of the ERP database (`db/migrations/009_auth.sql`; later ones come from `protobase auth migration`); `bun run --cwd examples/erp serve` (or `protobase dev`) then needs `BETTER_AUTH_SECRET` in `.env` and serves real sign-in. See [Login with Better Auth](https://docs.protobase.net/reference/auth/). There is no passwordless mode: create the first admin with `protobase users create <email>`, and mint a bearer token for curl with `protobase token <email>`.
+`bun run db:migrate` also creates Better Auth's tables in the `auth` schema of the ERP database (`db/migrations/009_auth.sql`; later ones come from `protobase auth migration`); `bun run serve` (or `protobase dev`) then needs `BETTER_AUTH_SECRET` in `.env` and serves real sign-in. See [Login with Better Auth](https://docs.protobase.net/reference/auth/). There is no passwordless mode: create the first admin with `protobase users create <email>`, and mint a bearer token for curl with `protobase token <email>`.
 
 The ERP has [organizations](https://docs.protobase.net/reference/auth/#organizations) on (`auth/auth.ts`): the seed writes its organizations to the auth schema too, under the ids its records use, and the first user owns them. Everyone else joins one with an organization role and app roles, by invitation in the app or on the host:
 
@@ -72,15 +108,24 @@ A new organization takes the next id of `core.organizations` and gets its row th
 The ERP has no server code of its own: `protobase.config.ts` exports the config, `auth` and `authenticate`, and protobase serves it.
 
 ```sh
-bun run --cwd examples/erp serve    # protobase build, then protobase serve dist on port 8787 (PORT): the UI and the API, from source
+bun run serve    # protobase build, then protobase serve dist on port 8787 (PORT): the UI and the API, from source
 ```
 
 For a deployment, ship the bundle folder: the host serves its `public/` and runs its config module with the serve runtime under Bun:
 
 ```sh
-bun run --cwd examples/erp build    # examples/erp/dist/: the config module, the app and protobase.ui.tsx as a plugin in public/, and protobase.bundle.json
-bun run build:serve           # dist/protobase-serve.js at the repository root, the runtime
+bun run build    # dist/: the config module, the app and protobase.ui.tsx as a plugin in public/, and protobase.bundle.json
+bun run protobase build-serve    # protobase-serve.js, the runtime
 bun --no-install /opt/protobase/protobase-serve.js /app/protobase.config.js
 ```
 
 The host passes `DATABASE_URL`, `PORT`, `REQUEST_LOG` (`true` logs every request), and for password reset `PROTOBASE_SMTP_URL` and `PROTOBASE_MAIL_FROM`; the ERP itself reads `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `TRUSTED_ORIGINS`. Run `db:migrate` against the database before the first start. The bundle's shape and the runtime's lifecycle are in the [CLI reference](https://docs.protobase.net/reference/cli/#build).
+
+## Contributing
+
+Contributions are welcome, from a typo to a new screen: see [CONTRIBUTING.md](CONTRIBUTING.md). A problem in Protobase
+itself goes to [Protobase's issues](https://github.com/PrototeamHQ/protobase/issues).
+
+## Licence
+
+[Apache License 2.0](LICENSE).

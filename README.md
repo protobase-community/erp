@@ -8,17 +8,6 @@ Amsterdam time, organizations, cost fields that only some roles may read, and a 
 The seed holds two organizations, Dutch, German and English companies and three years of history, from a small set
 up to 10,000,000 stock moves.
 
-## Deploy on Protobase Cloud
-
-[Start in the cloud with the ERP](https://admin.protobase.net/start?preset=erp): sign up with GitHub or email, choose where its code
-goes (kept on Protobase, or a new private GitHub repository) and your workspace address. The app is created from this
-repository with its base data and is live in a few minutes. Protobase Cloud is in early access, with
-[plans](https://protobase.net/pricing) from €0.99 a month per app.
-
-Already have a workspace? In the [console](https://admin.protobase.net), press **New app** and pick **ERP** under
-**Start from**. To deploy your own copy instead, made with **Use this template** below, pick
-**An existing GitHub repository**: Protobase keeps the app in sync with it and deploys every push.
-
 ## Run it locally
 
 You need [Bun](https://bun.sh) 1.4 and Docker.

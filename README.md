@@ -1,21 +1,25 @@
 # ERP
 
-A sample ERP for small and medium companies: customers and contacts (CRM), a product catalog, sales orders and
-invoices, inventory across warehouses, and HR, for several organizations at once. It runs on a real Postgres 18
-database with five module schemas, seeded deterministically with Dutch, German and English companies, EUR prices and
-three years of history (up to 2026-10-06), so every screen has realistic data from the start.
+An ERP for an industrial supplier: companies and contacts, a product catalog, sales orders and invoices,
+inventory across warehouses, and HR. 19 resources across 6 schemas, including a legacy `hr."EMP_MASTER"` table, and 8
+roles, from sales and the warehouse to the auditor. It has a sales overview page, an API function, a nightly job on
+Amsterdam time, organizations, cost fields that only some roles may read, and a bottom bar for the warehouse on phones.
 
-## Use this template
+The seed holds two organizations, Dutch, German and English companies and three years of history, from a small set
+up to 10,000,000 stock moves.
 
-Press **Use this template** at the top of this page, then **Create a new repository**, to get your own copy with a
-clean history. Clone it and follow the setup below:
+## Deploy on Protobase Cloud
 
-```sh
-git clone https://github.com/<you>/<your-repository>.git
-cd <your-repository>
-```
+[Start in the cloud with the ERP](https://admin.protobase.net/start?preset=erp): sign up with GitHub or email, choose where its code
+goes (kept on Protobase, or a new private GitHub repository) and your workspace address. The app is created from this
+repository with its base data and is live in a few minutes. Protobase Cloud is in early access, with
+[plans](https://protobase.net/pricing) from €0.99 a month per app.
 
-## Setup
+Already have a workspace? In the [console](https://admin.protobase.net), press **New app** and pick **ERP** under
+**Start from**. To deploy your own copy instead, made with **Use this template** below, pick
+**An existing GitHub repository**: Protobase keeps the app in sync with it and deploys every push.
+
+## Run it locally
 
 You need [Bun](https://bun.sh) 1.4 and Docker.
 
@@ -26,11 +30,41 @@ bun run db:migrate
 bun run db:seed --scale small     # small | medium | large
 bun run protobase users create you@example.com --generate-password
 bun run dev                       # http://localhost:5173
-bun run test                      # the unit tests next to the config and the seed
+bun run test
 ```
 
 Set your own `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`). The first user owns the seeded organizations;
-[Login](#login) says how others join.
+[Login](#login) says how others join. `bun run db:down` stops the database.
+
+## Use it as a template
+
+Press **Use this template** at the top of this page, then **Create a new repository**, to get your own copy with a
+clean history. Clone it and run it as above:
+
+```sh
+git clone https://github.com/<you>/<your-repository>.git
+cd <your-repository>
+```
+
+You can also fork it to contribute back, or start from it with `git clone https://github.com/protobase-community/erp.git`.
+
+## Customise it
+
+- **Tables and screens.** Each table's data config is in `config/<name>/data.ts` (fields, validation, who may read
+  and change what) and its screens in `config/<name>/ui.ts` (lists, filters, record pages), all exported from
+  `config/index.ts`. See the [data config](https://docs.protobase.net/reference/data-config/) and [UI config](https://docs.protobase.net/reference/ui-config/)
+  references.
+- **Database changes.** Add a migration in `db/migrations/`, numbered after the last one, and run
+  `bun run db:migrate`. Never edit a migration that has run. For a new table, `bun run protobase scaffold
+  <connection string> --ui` reads the database and writes its `data.ts` and `ui.ts`, which you then adjust.
+- **Sign-in and accounts** are in `auth/`, on Better Auth ([Login](https://docs.protobase.net/reference/auth/)).
+- **Coding agents.** [AGENTS.md](AGENTS.md) holds the rules an assistant follows when it changes the app.
+- Check every change with `bun run typecheck`, `bun run test` and `bun run build`, as CI does.
+
+- **Roles.** The 8 roles and what each may do are in `config/roles.ts`; the `costs` area gates the cost columns.
+  See [Access](https://docs.protobase.net/reference/access/).
+- **Pages and jobs.** The sales overview is `config/overview/`, the nightly job `config/jobs.ts`
+  ([Jobs](https://docs.protobase.net/reference/jobs/)), and the warehouse's phone bar `config/bottom-bar.ts`.
 
 ## Built with Protobase
 

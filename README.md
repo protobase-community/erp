@@ -137,7 +137,7 @@ numbers and tax rates as other countries write them.
 | Scale | Companies | Orders | Stock moves | Products | Seed time (Apple silicon, local Docker) |
 | --- | --- | --- | --- | --- | --- |
 | small | 200 | 2,000 | 20,000 | 200 | about 1 s |
-| medium | 20,000 | 200,000 | 1,000,000 | 2,000 | about 50 s (660 MB) |
+| medium | 20,000 | 200,000 | 1,000,000 | 2,000 | about 50 s (700 MB) |
 | large | 20,000 | 200,000 | 10,000,000 | 2,000 | not timed since foreign keys are checked (2.8 GB) |
 
 `db:seed` truncates everything first, so it can be re-run or used to switch scale. The loader streams `COPY`, drops secondary indexes during the load and rebuilds them afterwards, switches the tables' own triggers off while it writes the totals they compute, then resets identity sequences and runs `ANALYZE` so `pg_stats` is populated. Foreign keys are checked throughout: the role an app gets may not skip them. The scale last seeded is recorded in `public.seed_info`.

@@ -3,7 +3,7 @@ import { productPriceCents } from '../builders/product'
 import { timestamps, yearOf } from '../calendar'
 import { copyRows } from '../copy'
 import { binOffsets } from '../data/layout'
-import { iso, money, row } from '../format'
+import { iso, money, roundTo, row } from '../format'
 import { int, makeRng, pick, weighted } from '../rng'
 import type { Org, World } from '../world'
 
@@ -18,7 +18,7 @@ const createLedger = (org: Org) => {
   const stock = new Int32Array(org.productCount * bins)
   const touched = new Uint8Array(stock.length)
   const lastMovedAt = new Float64Array(stock.length)
-  const prices = Int32Array.from({ length: org.productCount }, (_, ordinal) => productPriceCents(ordinal))
+  const prices = Int32Array.from({ length: org.productCount }, (_, ordinal) => productPriceCents(org, ordinal))
   const locationOf = (bin: number) => org.warehouses[Math.floor(bin / binsPerWarehouse)]!.firstLocationId + binOffsets[bin % binsPerWarehouse]!
   const warehouseOf = (bin: number) => org.warehouses[Math.floor(bin / binsPerWarehouse)]!.id
 
@@ -33,7 +33,7 @@ const createLedger = (org: Org) => {
       stock[product * bins + bin]! += quantity
       touched[product * bins + bin] = 1
       lastMovedAt[product * bins + bin] = at
-      return row(id++, org.id, org.productFirstId + product, warehouseOf(bin), locationOf(bin), kind, quantity, money(Math.round(prices[product]! * 0.62)), reference, iso(at), userId)
+      return row(id++, org.id, org.productFirstId + product, warehouseOf(bin), locationOf(bin), kind, quantity, money(roundTo(prices[product]! * 0.62, org.step)), reference, iso(at), userId)
     }
 
     while (index < org.moveCount) {

@@ -11,7 +11,7 @@ function* categoryRows(world: World) {
   for (const org of world.orgs) {
     for (const [index, category] of categories.entries()) {
       const parentId = category.parent === null ? null : org.categoryFirstId + category.parent
-      yield row(org.categoryFirstId + index, org.id, parentId, category.name, category.slug, category.position, createdAt, createdAt)
+      yield row(org.categoryFirstId + index, org.id, parentId, category.name[org.catalog], category.slug, category.position, createdAt, createdAt)
     }
   }
 }
@@ -23,7 +23,7 @@ function* productRows(world: World) {
       const createdAt = iso(product.createdAt)
       const deletedAt = product.deletedAt === null ? null : iso(product.deletedAt)
       const updatedAt = iso(Math.max(product.createdAt, product.deletedAt ?? windowStart - 30 * DAY))
-      yield row(product.id, org.id, product.categoryId, product.sku, product.name, product.description, money(product.priceCents), 'EUR', JSON.stringify(product.attributes), deletedAt === null, deletedAt, createdAt, updatedAt)
+      yield row(product.id, org.id, product.categoryId, product.sku, product.name, product.description, money(product.priceCents), org.currency, JSON.stringify(product.attributes), deletedAt === null, deletedAt, createdAt, updatedAt)
     }
   }
 }

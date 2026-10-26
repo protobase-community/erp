@@ -30,10 +30,10 @@ export const buildWorld = (name: ScaleName) => {
     for (let ordinal = 0; ordinal < companyCount; ordinal++) {
       personStarts[ordinal + 1] = personStarts[ordinal]! + weighted(rngAt(spec.seed + 3, ordinal), [[1, 30], [2, 40], [3, 30]] as const)
     }
-    const users = spec.users.map(([first, initial, role], position) => ({
+    const users = spec.users.map(([userName, emailName, role], position) => ({
       id: next.user + position,
-      name: `${first} ${initial}`,
-      email: `${first.toLowerCase()}@${spec.slug}.example`,
+      name: userName,
+      email: `${emailName}@${spec.slug}.example`,
       role,
     }))
     const warehouses = spec.warehouses.map(([code, warehouseName, city, country], position) => ({

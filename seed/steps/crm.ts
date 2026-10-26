@@ -12,7 +12,7 @@ function* companyRows(world: World) {
     for (let ordinal = 0; ordinal < org.companyCount; ordinal++) {
       const company = companyAt(org, ordinal)
       const createdAt = iso(company.createdAt)
-      yield row(company.id, org.id, company.name, company.country, company.city, company.vatNumber, company.email, company.phone, company.status, createdAt, createdAt)
+      yield row(company.id, org.id, company.name, company.country, company.street, company.postalCode, company.city, company.region, company.vatNumber, company.email, company.phone, company.status, createdAt, createdAt)
     }
   }
 }
@@ -55,7 +55,7 @@ function* companyTagRows(world: World) {
 }
 
 export const seedCrm = async (sql: Db, world: World) => {
-  await copyRows(sql, 'crm.companies (id, organization_id, name, country_code, city, vat_number, email, phone, status, created_at, updated_at)', companyRows(world))
+  await copyRows(sql, 'crm.companies (id, organization_id, name, country_code, street, postal_code, city, region, vat_number, email, phone, status, created_at, updated_at)', companyRows(world))
   await copyRows(sql, 'crm.people (id, organization_id, company_id, first_name, last_name, email, phone, job_title, created_at, updated_at)', personRows(world))
   await copyRows(sql, 'crm.tags (id, organization_id, name, color, created_at, updated_at)', tagRows(world))
   await copyRows(sql, 'crm.company_tags (company_id, tag_id, organization_id, added_by, added_at)', companyTagRows(world))

@@ -1,7 +1,7 @@
 import { connect } from '../db/connection'
 import { seedAuthOrganizations } from './auth-organizations'
 import { baseOrganization } from './base-organization'
-import { countries, currencies } from './data/reference'
+import { countries, currencies } from './data/iso'
 
 // `db:seed:base [--name <app name>]`: what a new app starts with, the countries, the currencies and organization 1,
 // in the ERP's tables and in the auth schema's.

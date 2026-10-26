@@ -1,10 +1,12 @@
 import { DAY, windowEnd, windowStart, within, yearOf } from '../calendar'
+import { locales } from '../data/names'
+import { roundTo } from '../format'
 import { int, pick, rngAt, weighted } from '../rng'
 import type { Org } from '../world'
 import { companyAt, legacyCompanies, peopleOf } from './company'
 import { productName, productPriceCents } from './product'
 
-const notes = ['Deliver before 10:00', 'Call on arrival', 'Partial delivery accepted', 'Customer pickup', 'Include delivery note in box', 'Urgent, production stopped']
+const notes = ['Deliver before 10:00', 'Call on arrival', 'Partial delivery accepted', 'Customer pickup', 'Include delivery note in box', 'Urgent 🚨 production stopped', 'Fragile ⚠️ handle with care']
 
 const statusFor = (ageDays: number, rand: () => number) => {
   if (ageDays < 2) return pick(rand, ['draft', 'confirmed', 'confirmed', 'picking'] as const)
@@ -40,9 +42,9 @@ export const orderAt = (org: Org, ordinal: number) => {
     return {
       lineNo: index + 1,
       productId: org.productFirstId + productOrdinal,
-      description: productName(productOrdinal),
+      description: productName(org, productOrdinal),
       quantity: weighted(rand, [[int(rand, 1, 5), 50], [int(rand, 6, 20), 35], [int(rand, 21, 60), 15]] as const),
-      unitPriceCents: Math.round((productPriceCents(productOrdinal) * (100 - discount)) / 100),
+      unitPriceCents: roundTo((productPriceCents(org, productOrdinal) * (100 - discount)) / 100, org.step),
     }
   })
   const paid = status === 'delivered' ? rand() < 0.88 : status === 'shipped' ? rand() < 0.3 : false
@@ -56,7 +58,8 @@ export const orderAt = (org: Org, ordinal: number) => {
     discount,
     totalCents: lines.reduce((sum, line) => sum + line.quantity * line.unitPriceCents, 0),
     paid,
-    notes: rand() < 0.08 ? pick(rand, notes) : null,
+    // Half in the customer's own language.
+    notes: rand() < 0.08 ? (rand() < 0.5 ? locales[company.country].note : pick(rand, notes)) : null,
     createdAt,
     updatedAt: within(createdAt, Math.floor(rand() * (status === 'draft' ? 0.1 : 8) * DAY), rand),
     lines,

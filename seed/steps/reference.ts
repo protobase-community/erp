@@ -1,7 +1,7 @@
 import type { Db } from '../../db/connection'
 import { DAY, windowStart } from '../calendar'
 import { copyRows } from '../copy'
-import { countries, currencies } from '../data/reference'
+import { countries, currencies } from '../data/iso'
 import { iso, row } from '../format'
 import type { World } from '../world'
 import { seedAuthOrganizations } from '../auth-organizations'
@@ -13,7 +13,7 @@ export const seedReference = async (sql: Db, world: World) => {
   await copyRows(
     sql,
     'core.organizations (id, name, slug, country_code, currency_code, created_at, updated_at)',
-    world.orgs.map((org) => row(org.id, org.name, org.slug, org.country, 'EUR', createdAt, createdAt)),
+    world.orgs.map((org) => row(org.id, org.name, org.slug, org.country, org.currency, createdAt, createdAt)),
   )
   await seedAuthOrganizations(sql, world.orgs)
   await copyRows(

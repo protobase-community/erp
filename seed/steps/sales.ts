@@ -9,7 +9,7 @@ function* orderRows(world: World) {
   for (const org of world.orgs) {
     for (let ordinal = 0; ordinal < org.orderCount; ordinal++) {
       const order = orderAt(org, ordinal)
-      yield row(order.id, org.id, order.number, order.company.id, order.personId, order.ownerId, order.status, 'EUR', money(order.discount * 100), money(order.totalCents), order.paid, order.notes, iso(order.createdAt), iso(order.updatedAt))
+      yield row(order.id, org.id, order.number, order.company.id, order.personId, order.ownerId, order.status, org.currency, money(order.discount * 100), money(order.totalCents), order.paid, order.notes, iso(order.createdAt), iso(order.updatedAt))
     }
   }
 }

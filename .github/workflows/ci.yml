@@ -35,4 +35,6 @@ jobs:
       - run: bun run test
       - run: bun run build
       - run: bun run db:migrate
+      # The check a deploy runs: every list, filter and sort the config allows has an index to serve it.
+      - run: bun run db:doctor
       - run: bun run db:seed --scale small

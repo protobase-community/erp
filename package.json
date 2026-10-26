@@ -18,6 +18,7 @@
     "db:migrate": "bun db/migrate.ts",
     "db:seed:base": "bun seed/base.ts",
     "db:seed": "bun seed/cli.ts",
+    "db:doctor": "bun db/doctor.ts",
     "db:reset": "bun db/drop.ts && bun db/migrate.ts && bun seed/cli.ts --scale small",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

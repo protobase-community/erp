@@ -2,7 +2,7 @@ import { userMenu } from '@protobase/schema'
 
 /**
  * Account pages under the signed-in user instead of in the sidebar, then help. `failed_jobs` is Protobase's page of
- * background tasks that gave up, such as the overdue invoice checks (`config/jobs.ts`): admins only, so others never see it.
+ * background tasks that gave up, such as the overdue invoice checks (`jobs/`): admins only, so others never see it.
  */
 export const accountMenu = userMenu((m) => [
   m.resource('organizations', { label: 'Organization', icon: 'building' }),

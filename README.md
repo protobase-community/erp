@@ -29,7 +29,7 @@ Working with a coding agent? `bun run protobase skill install` copies the Protob
 `.claude/skills` and `.agents/skills`, where Claude Code, Codex, Cursor and others read them; run it again after an
 upgrade.
 
-Set your own `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`). The first user owns the seeded organizations;
+Set your own `PROTOBASE_SECRET` in `.env` (`openssl rand -base64 32`). The first user owns the seeded organizations;
 [Login](#login) says how others join. `bun run db:down` stops the database.
 
 ## Use it as a template
@@ -62,8 +62,9 @@ You can also fork it to contribute back, or start from it with `git clone https:
 
 - **Roles.** The 8 roles and what each may do are in `config/roles.ts`; the `costs` area gates the cost columns.
   See [Access](https://docs.protobase.net/reference/access/).
-- **Pages and jobs.** The sales overview is `config/overview/`, the nightly job `config/jobs.ts`
-  ([Jobs](https://docs.protobase.net/reference/jobs/)), and the warehouse's phone bar `config/bottom-bar.ts`.
+- **Pages and jobs.** The sales overview is `config/overview/`, the overdue invoice jobs `jobs/` with the write hook
+  that enqueues them `hooks/` ([Jobs](https://docs.protobase.net/reference/jobs/)), and the warehouse's phone bar
+  `config/bottom-bar.ts`.
 
 ## Host it on Protobase Cloud
 
@@ -151,9 +152,9 @@ numbers and tax rates as other countries write them.
 
 ## Login
 
-`bun run db:migrate` also creates Better Auth's tables in the `auth` schema of the ERP database (`db/migrations/009_auth.sql`; later ones come from `protobase auth migration`); `bun run serve` (or `protobase dev`) then needs `BETTER_AUTH_SECRET` in `.env` and serves real sign-in. See [Login with Better Auth](https://docs.protobase.net/reference/auth/). There is no passwordless mode: create the first admin with `protobase users create <email>`, and mint a bearer token for curl with `protobase token <email>`.
+`bun run db:migrate` also creates Better Auth's tables in the `auth` schema of the ERP database (`db/migrations/009_auth.sql`; later ones come from `protobase migration`); `bun run serve` (or `protobase dev`) then needs `PROTOBASE_SECRET` in `.env` and serves real sign-in. See [Login with Better Auth](https://docs.protobase.net/reference/auth/). There is no passwordless mode: create the first admin with `protobase users create <email>`, and mint a bearer token for curl with `protobase token <email>`.
 
-The ERP has [organizations](https://docs.protobase.net/reference/auth/#organizations) on (`auth/auth.ts`): the seed writes its organizations to the auth schema too, under the ids its records use, and the first user owns them. Everyone else joins one with an organization role and app roles, by invitation in the app or on the host:
+The ERP has [organizations](https://docs.protobase.net/reference/auth/#organizations) on (`protobase.config.ts`): the seed writes its organizations to the auth schema too, under the ids its records use, and the first user owns them. Everyone else joins one with an organization role and app roles, by invitation in the app or on the host:
 
 ```sh
 protobase users create amara@example.com --organization meridian --org-role admin --app-roles manager
@@ -161,11 +162,11 @@ protobase organizations add-member seiran amara@example.com --app-roles sales
 protobase organizations list
 ```
 
-A new organization takes the next id of `core.organizations` and gets its row there (`onCreated`). A new user takes the next id of `core.users` (`generateUserId`), which orders name as their owner, and gets their row there when they first join an organization (`db/migrations/019_auth_users.sql`), so `sales` sees and changes the orders they own; the ERP's own `role` column stays empty for them, since their roles live in the auth schema.
+A new organization takes the next id of `core.organizations` and gets its row there (`onOrganizationCreated` in `auth/hooks.ts`). A new user takes the next id of `core.users` (`generateUserId`), which orders name as their owner, and gets their row there when they first join an organization (`db/migrations/019_auth_users.sql`), so `sales` sees and changes the orders they own; the ERP's own `role` column stays empty for them, since their roles live in the auth schema.
 
 ## Serve and deploy
 
-The ERP has no server code of its own: `protobase.config.ts` exports the config, `auth` and `authenticate`, and protobase serves it.
+The ERP has no server of its own: `protobase.config.ts` describes the app, Protobase finds its code by path (`config/`, `auth/hooks.ts`, `jobs/`, `hooks/`, `functions/`) and serves it.
 
 ```sh
 bun run serve    # protobase build, then protobase serve dist on port 8787 (PORT): the UI and the API, from source
@@ -179,7 +180,7 @@ bun run protobase build-serve    # protobase-serve.js, the runtime
 bun --no-install /opt/protobase/protobase-serve.js /app/protobase.config.js
 ```
 
-The host passes `DATABASE_URL`, `PORT`, `REQUEST_LOG` (`true` logs every request), and for password reset `PROTOBASE_SMTP_URL` and `PROTOBASE_MAIL_FROM`; the ERP itself reads `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `TRUSTED_ORIGINS`. Run `db:migrate` against the database before the first start. The bundle's shape and the runtime's lifecycle are in the [CLI reference](https://docs.protobase.net/reference/cli/#build).
+The host passes `DATABASE_URL`, `PORT`, `REQUEST_LOG` (`true` logs every request), and for password reset `PROTOBASE_SMTP_URL` and `PROTOBASE_MAIL_FROM`; the ERP itself reads `PROTOBASE_SECRET`, `PROTOBASE_URL`, and `PROTOBASE_TRUSTED_ORIGINS`. Run `db:migrate` against the database before the first start. The bundle's shape and the runtime's lifecycle are in the [CLI reference](https://docs.protobase.net/reference/cli/#build).
 
 ## Contributing
 

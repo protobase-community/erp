@@ -1,17 +1,19 @@
-import { createAdmin, configExports } from '@protobase/server'
+import { createAdmin, configExports, defineJob } from '@protobase/server'
 import { describe, expect, it } from 'vitest'
 import * as config from './index'
-import * as jobs from './jobs'
+import project from '../protobase.config'
 import { roles } from './roles'
 
 describe('ERP sidebar, user menu and bottom bar', () => {
   const { resources, views, pages, userMenu, bottomBars } = configExports(config)
+  // The config's jobs, which give admins the failed jobs page; their runs are jobs/<name>.ts, which this test never runs.
+  const jobs = Object.keys(project.jobs ?? {}).map((name) => defineJob({ name, run: () => {} }))
 
   it('has recent groups that fit their resources', () => {
     const grouped = views.map((view) => view.toModel()).filter((view) => view.nav?.recent)
     expect(grouped.map((view) => view.resource).sort()).toEqual(['invoices', 'orders'])
     // createAdmin refuses a group or a user menu entry that does not fit, before any request.
-    expect(() => createAdmin({ resources, views, pages, userMenu, jobs: Object.values(jobs).filter((job) => typeof job !== 'function'), db: {} as never, authenticate: () => { throw new Error('No requests in this test') } })).not.toThrow()
+    expect(() => createAdmin({ resources, views, pages, userMenu, jobs, db: {} as never, authenticate: () => { throw new Error('No requests in this test') } })).not.toThrow()
   })
 
   it('moves the account pages into the user menu', () => {

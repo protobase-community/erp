@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { WriteEvent } from '@protobase/server'
-import { overdueCheck } from './jobs'
+import { overdueCheck } from './schedule-overdue-check'
 
 const event = (operation: WriteEvent['operation'], after?: Record<string, unknown>, resource = 'invoices') =>
   ({ operation, resource: { name: resource }, user: { id: 1, roles: [] }, ...(after && { after }) }) as unknown as WriteEvent

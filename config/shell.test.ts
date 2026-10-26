@@ -1,6 +1,7 @@
 import { createAdmin, configExports } from '@protobase/server'
 import { describe, expect, it } from 'vitest'
 import * as config from './index'
+import * as jobs from './jobs'
 import { roles } from './roles'
 
 describe('ERP sidebar, user menu and bottom bar', () => {
@@ -10,11 +11,11 @@ describe('ERP sidebar, user menu and bottom bar', () => {
     const grouped = views.map((view) => view.toModel()).filter((view) => view.nav?.recent)
     expect(grouped.map((view) => view.resource).sort()).toEqual(['invoices', 'orders'])
     // createAdmin refuses a group or a user menu entry that does not fit, before any request.
-    expect(() => createAdmin({ resources, views, pages, userMenu, db: {} as never, authenticate: () => { throw new Error('No requests in this test') } })).not.toThrow()
+    expect(() => createAdmin({ resources, views, pages, userMenu, jobs: Object.values(jobs).filter((job) => typeof job !== 'function'), db: {} as never, authenticate: () => { throw new Error('No requests in this test') } })).not.toThrow()
   })
 
   it('moves the account pages into the user menu', () => {
-    expect(userMenu?.toUserMenuModel().items.map((item) => (item.kind === 'resource' ? item.resource : item.kind === 'page' ? item.page : item.label))).toEqual(['organizations', 'accounts', 'Documentation', 'Support'])
+    expect(userMenu?.toUserMenuModel().items.map((item) => (item.kind === 'resource' ? item.resource : item.kind === 'page' ? item.page : item.label))).toEqual(['organizations', 'accounts', 'failed_jobs', 'Documentation', 'Support'])
   })
 
   it('gives the warehouse role a bottom bar that fits the resources and roles', () => {

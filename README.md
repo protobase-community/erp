@@ -14,7 +14,7 @@ You need [Bun](https://bun.sh) 1.4 and Docker.
 
 ```sh
 bun install
-bun run db:up                     # Postgres 18 in Docker on port 55432; creates .env from .env.example
+bun run db:up                     # Postgres 18 in Docker on port 55433; creates .env from .env.example
 bun run db:migrate
 bun run db:seed --scale small     # small | medium | large
 bun run protobase users create you@example.com --generate-password
@@ -72,10 +72,10 @@ You can also fork it to contribute back, or start from it with `git clone https:
 
 Other scripts: `db:seed:base` (the countries, the currencies and organization 1, named with `--name`: what an app made from the ERP preset starts with), `db:reset` (drop, migrate, seed small), `typecheck`. `bun run db:down` stops the container; the `pgdata` volume stays, remove it with `docker compose down -v`. The database tests run in [Protobase's repository](https://github.com/PrototeamHQ/protobase) (`bun run test:integration`).
 
-Connection string (port 55432 avoids a local Postgres on 5432):
+Connection string (port 55433 avoids a local Postgres on 5432 and the other Protobase templates, which take 55432, 55434 and 55435, so they run side by side):
 
 ```
-postgres://protobase:protobase@localhost:55432/protobase
+postgres://protobase:protobase@localhost:55433/protobase
 ```
 
 Scripts read `DATABASE_URL` from the environment or from the git-ignored `.env` next to `package.json` (a copy of `.env.example`), and fall back to the string above.

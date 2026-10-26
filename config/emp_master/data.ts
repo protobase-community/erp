@@ -7,7 +7,7 @@ export const empMaster = resource('emp_master')
   .fields({
     emp_id: f.integer().column('EMP_ID').filterable().sortable(),
     organization_id: f.relation('organizations').column('ORGANIZATION_ID').filterable().sortable(),
-    emp_name: f.text().column('EMP_NAME'),
+    emp_name: f.text().max(200).column('EMP_NAME'),
     dept_cd: f.text().column('DEPT_CD'),
     hire_dt: f.date().column('HIRE_DT'),
     sal_amt: f.decimal({ precision: 10, scale: 2 }).optional().column('SAL_AMT').access({ read: roles.is('admin') }),

@@ -9,7 +9,7 @@ export const people = resource('people')
     organization_id: f.relation('organizations').filterable().sortable(),
     company_id: f.relation('companies').filterable().sortable(),
     first_name: f.text(),
-    last_name: f.text(),
+    last_name: f.text().optional(),
     email: f.text().optional(),
     phone: f.text().optional(),
     job_title: f.text().optional(),

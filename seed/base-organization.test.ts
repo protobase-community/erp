@@ -11,6 +11,17 @@ describe('baseOrganization', () => {
     expect(baseOrganization('!!!').slug).toBe('organization')
   })
 
+  it('keeps a name in any script as it is written, with an ASCII slug', () => {
+    expect(baseOrganization('  青嵐産業資材株式会社 ')).toMatchObject({ name: '青嵐産業資材株式会社', slug: 'organization' })
+    expect(baseOrganization('Þór & Dóttir ehf.').slug).toBe('thor-dottir-ehf')
+  })
+
+  it('takes the country and currency it is given', () => {
+    expect(baseOrganization('Acme', 'JP', 'JPY')).toMatchObject({ country_code: 'JP', currency_code: 'JPY' })
+    expect(() => baseOrganization('Acme', 'XX')).toThrow('country')
+    expect(() => baseOrganization('Acme', 'JP', 'YEN')).toThrow('currency')
+  })
+
   it('refuses an empty name', () => {
     expect(() => baseOrganization('  ')).toThrow('name')
   })

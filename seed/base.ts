@@ -3,11 +3,14 @@ import { seedAuthOrganizations } from './auth-organizations'
 import { baseOrganization } from './base-organization'
 import { countries, currencies } from './data/iso'
 
-// `db:seed:base [--name <app name>]`: what a new app starts with, the countries, the currencies and organization 1,
-// in the ERP's tables and in the auth schema's.
-// Rows already there stay as they are, so it can run again and after the sample seed (`db:seed`).
-const flag = process.argv.indexOf('--name')
-const organization = baseOrganization(flag === -1 ? 'ERP' : (process.argv[flag + 1] ?? ''))
+// `db:seed:base [--name <app name>] [--country <code>] [--currency <code>]`: what a new app starts with, the countries,
+// the currencies and organization 1 (in the Netherlands and in euros unless told otherwise), in the ERP's tables and in
+// the auth schema's. Rows already there stay as they are, so it can run again and after the sample seed (`db:seed`).
+const option = (name: string) => {
+  const flag = process.argv.indexOf(`--${name}`)
+  return flag === -1 ? undefined : (process.argv[flag + 1] ?? '')
+}
+const organization = baseOrganization(option('name') ?? 'ERP', option('country')?.toUpperCase(), option('currency')?.toUpperCase())
 
 const sql = connect({ max: 1 })
 await sql.begin(async (tx) => {

@@ -12,10 +12,10 @@ export const invoicesView = view<typeof invoices>('invoices')
     status: r.status.help('Sent invoices are emailed to the customer; overdue ones trigger reminders.').format('badge').valueLabels({ draft: 'Draft', sent: 'Sent', paid: 'Paid', overdue: 'Overdue' }),
     issued_at: r.issued_at.label('Issue date').help('The date printed on the invoice.'),
     due_at: r.due_at.label('Due date').help('Usually the issue date plus the payment terms.'),
-    vat_rate: r.vat_rate.label('VAT rate').help('Percentage added to the subtotal.').format('percent'),
-    subtotal: r.subtotal.prefix('€').decimals(2),
-    vat: r.vat.label('VAT').prefix('€').decimals(2),
-    total: r.total.help('Subtotal plus VAT.').prefix('€').decimals(2),
+    vat_rate: r.vat_rate.label('Tax rate').help('The VAT, GST or consumption tax of the customer’s country, added to the subtotal: 0 where none applies.').format('percent'),
+    subtotal: r.subtotal.help('In the organization’s currency.').decimals(2),
+    vat: r.vat.label('Tax').decimals(2),
+    total: r.total.help('Subtotal plus tax.').decimals(2),
   }))
   .list((r) => ({
     columns: [r.number, r.company_id, r.status, r.issued_at, r.due_at, r.total],
@@ -27,7 +27,7 @@ export const invoicesView = view<typeof invoices>('invoices')
       help: 'Who is being billed and when payment is due. Changes are saved when you press Save.',
     }),
     l.section('Totals', [r.vat_rate, r.subtotal, r.vat, r.total], {
-      help: 'Calculated from the invoice lines. The VAT rate applies to the whole invoice.',
+      help: 'Calculated from the invoice lines. The tax rate applies to the whole invoice.',
     }),
     l.sidebar([r.status, r.total]),
   ])

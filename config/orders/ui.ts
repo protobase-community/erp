@@ -16,13 +16,14 @@ export const ordersView = view<typeof orders>('orders')
   .fields((r) => ({
     status: r.status.help('Where the order is in its life. Moving it forward can notify the customer.').format('badge')
       .valueLabels({ draft: 'Draft', confirmed: 'Confirmed', picking: 'Picking', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' }),
-    total: r.total.help('Order total including VAT.').prefix('€').decimals(2),
+    total: r.total.help('The sum of the lines, in the order’s currency.').decimals(2),
+    currency_code: r.currency_code.label('Currency'),
     discount_percent: r.discount_percent.label('Discount').help('Percentage taken off the order total.').format('percent'),
     paid: r.paid.help('Set when the payment has been received.'),
     created_at: r.created_at.label('Created').format('absolute'),
   }))
   .list((r) => ({
-    columns: [r.number, r.company_id, r.status, r.total, r.discount_percent, r.paid, r.owner_id, r.created_at],
+    columns: [r.number, r.company_id, r.status, r.total, r.currency_code, r.discount_percent, r.paid, r.owner_id, r.created_at],
     sort: [[r.created_at, 'desc']],
     search: [r.number],
   }))

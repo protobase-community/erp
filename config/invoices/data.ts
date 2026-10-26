@@ -13,7 +13,7 @@ export const invoices = resource('invoices')
     status: f.enum(['draft', 'sent', 'paid', 'overdue']).default('draft').filterable().sortable(),
     issued_at: f.date().filterable().sortable(),
     due_at: f.date(),
-    vat_rate: f.decimal({ precision: 4, scale: 2 }).default('21'),
+    vat_rate: f.decimal({ precision: 4, scale: 2 }),
     subtotal: f.decimal({ precision: 14, scale: 2 }).readOnly().default('0'),
     vat: f.decimal({ precision: 14, scale: 2 }).readOnly().default('0'),
     total: f.decimal({ precision: 14, scale: 2 }).readOnly().default('0'),

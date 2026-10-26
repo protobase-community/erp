@@ -9,7 +9,7 @@ export const stockMovesView = view<typeof stockMoves>('stock_moves')
     kind: r.kind.label('Type').help('Receipts add stock, issues remove it, transfers move it between locations.').format('badge').valueLabels({ receipt: 'Receipt', issue: 'Issue', transfer: 'Transfer', adjustment: 'Adjustment' }),
     quantity: r.quantity.help('Negative for issues.'),
     warehouse_id: r.warehouse_id.label('Warehouse'),
-    unit_cost: r.unit_cost.label('Unit cost').prefix('€').decimals(2),
+    unit_cost: r.unit_cost.label('Unit cost').decimals(2),
     user_id: r.user_id.label('By'),
   }))
   .list((r) => ({

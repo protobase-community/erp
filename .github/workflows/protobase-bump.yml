@@ -1,7 +1,8 @@
 name: protobase-bump
 
-# No schedule until the shared bump tool writes caret ranges: it would move ^ back to ~.
 on:
+  schedule:
+    - cron: "17 */6 * * *"
   workflow_dispatch:
     inputs:
       version:

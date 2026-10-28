@@ -84,8 +84,8 @@ live, and why a deploy failed.
 - Tested with Protobase **0.50.1**: the `@protobase/*` packages are dev dependencies at `^0.50.1` in `package.json`,
   so the app is bundled: dev, the build and the `db:*` scripts (through `protobase run`) use the CLI's own copies, and
   `protobase types` points the typecheck at them. A newer CLI within that range updates the app with no change to its
-  files. A GitHub Action (`.github/workflows/protobase-bump.yml`) moves the range to a release and merges the change
-  once CI passes. <gap>The Action cannot run on each new release yet because the shared bump tool does not write caret ranges.</gap> The [release notes](https://github.com/PrototeamHQ/protobase/releases) say what changed.
+  files. A GitHub Action (`.github/workflows/protobase-bump.yml`) moves the range when a new release comes out and
+  merges the change once CI passes. The [release notes](https://github.com/PrototeamHQ/protobase/releases) say what changed.
 - Docs: [docs.protobase.net](https://docs.protobase.net). Source and issues: [PrototeamHQ/protobase](https://github.com/PrototeamHQ/protobase).
 - This app started as an example in Protobase's repository; its history came with it.
 - The same app is the `erp` preset that new Protobase apps can start from ([`@protobase/presets`](https://github.com/PrototeamHQ/protobase/tree/main/packages/presets)).

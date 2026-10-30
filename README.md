@@ -81,7 +81,7 @@ live, and why a deploy failed.
 `config/<name>/data.ts` and its screens in `config/<name>/ui.ts`, all exported from `config/index.ts`, and
 `protobase dev` and `protobase serve` serve the API and the app from them.
 
-- Tested with Protobase **0.50.1**: the `@protobase/*` packages are dev dependencies at its caret range in `package.json`,
+- Tested with Protobase **0.66.0**: the `@protobase/*` packages are dev dependencies at its caret range in `package.json`,
   so the app is bundled: dev, the build and the `db:*` scripts (through `protobase run`) use the CLI's own copies, and
   `protobase types` points the typecheck at them. A newer CLI within that range updates the app with no change to its
   files. A GitHub Action (`.github/workflows/protobase-bump.yml`) moves the range when a new release comes out and

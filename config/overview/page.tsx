@@ -22,15 +22,15 @@ export const salesOverview = page(
         title="Biggest unpaid delivery"
         resource="orders"
         filter="status = 'delivered' AND paid = false"
-        sort="total desc"
+        sort={['total desc']}
         empty="Every delivered order is paid."
         actions={<Action name="markPaid" variant="primary" />}
       >
         <Grid columns={2}>
-          <Field name="number" />
-          <Field name="total" />
-          <Field name="company_id" label="Customer" />
-          <Field name="company_id.city" label="City" />
+          <Field source="number" />
+          <Field source="total" />
+          <Field source="company_id" label="Customer" />
+          <Field source="company_id.city" label="City" />
         </Grid>
         <Show when="company_id.status = 'dormant'">The customer has gone quiet: call before sending a reminder.</Show>
       </RecordCard>
@@ -38,15 +38,15 @@ export const salesOverview = page(
         title="Oldest overdue invoice"
         resource="invoices"
         filter="status = 'overdue'"
-        sort="issued_at"
+        sort={['issued_at']}
         empty="Nothing is overdue."
         actions={[<Action name="send" label="Send reminder" />, <Action name="recordPayment" variant="primary" />]}
       >
         <Grid columns={2}>
-          <Field name="number" />
-          <Field name="total" />
-          <Field name="company_id" label="Customer" />
-          <Field name="due_at" label="Due" />
+          <Field source="number" />
+          <Field source="total" />
+          <Field source="company_id" label="Customer" />
+          <Field source="due_at" label="Due" />
         </Grid>
       </RecordCard>
       <Card title="Orders per day" description="The last 30 days.">
@@ -58,21 +58,21 @@ export const salesOverview = page(
       <Chart title="Revenue by customer" description="Orders not cancelled." resource="orders" groupBy="company_id" sum="total" filter="status != 'cancelled'" limit={5} />
     </Grid>
     <Grid columns={2}>
-      <Table title="Overdue invoices" resource="invoices" filter="status = 'overdue'" sort="issued_at" columns={['number', 'company_id', 'due_at', 'total']} limit={5} empty="Nothing is overdue." />
-      <Table title="Latest orders" resource="orders" sort="created_at desc" columns={['number', 'company_id', 'status', 'total']} limit={5} />
+      <Table title="Overdue invoices" resource="invoices" filter="status = 'overdue'" sort={['issued_at']} columns={['number', 'company_id', 'due_at', 'total']} limit={5} empty="Nothing is overdue." />
+      <Table title="Latest orders" resource="orders" sort={['created_at desc']} columns={['number', 'company_id', 'status', 'total']} limit={5} />
     </Grid>
     <CardRow
       title="New leads"
       description="Companies that have not ordered yet."
       resource="companies"
       filter="status = 'lead'"
-      sort="created_at desc"
+      sort={['created_at desc']}
       limit={8}
       actions={<ModalForm mode="create" label="Add lead" resource="companies" fields={['name', 'city', 'country_code', 'email']} values={{ status: 'lead' }} />}
     >
-      <Field name="name" label={false} />
-      <Field name="city" />
-      <Field name="email" />
+      <Field source="name" label={false} />
+      <Field source="city" />
+      <Field source="email" />
       <ModalForm mode="edit" label="Edit" fields={['name', 'city', 'email', 'phone', 'status']} />
     </CardRow>
   </Page>,

@@ -91,7 +91,7 @@ live, and why a deploy failed.
 
 ## Database
 
-Other scripts: `db:seed:base` (the countries, the currencies and organization 1, named with `--name`, in the country and currency of `--country` and `--currency`, the Netherlands and euros otherwise: what an app made from the ERP preset starts with), `db:doctor` (`protobase doctor` against the database), `db:reset` (drop, migrate, seed small), `typecheck`. `bun run db:down` stops the container; the `pgdata` volume stays, remove it with `docker compose down -v`. The database tests run in [Protobase's repository](https://github.com/PrototeamHQ/protobase) (`bun run test:integration`).
+Other scripts: `db:seed:base` (the countries, the currencies and organization 1, named with `--name`, in the country and currency of `--country` and `--currency`, the Netherlands and euros otherwise: what an app made from the ERP preset starts with), `db:doctor` (`protobase doctor` against the database), `db:reset` (drop, migrate, seed small), `typecheck`, `test:db` (the seed's tests against the migrated database, whose app data they replace). `bun run db:down` stops the container; the `pgdata` volume stays, remove it with `docker compose down -v`. The other database tests run in [Protobase's repository](https://github.com/PrototeamHQ/protobase) (`bun run test:integration`).
 
 Connection string (port 55433 avoids a local Postgres on 5432 and the other Protobase templates, which take 55432, 55434 and 55435, so they run side by side):
 
@@ -142,7 +142,7 @@ numbers and tax rates as other countries write them.
 | medium | 20,000 | 200,000 | 1,000,000 | 2,000 | about 50 s (700 MB) |
 | large | 20,000 | 200,000 | 10,000,000 | 2,000 | not timed since foreign keys are checked (2.8 GB) |
 
-`db:seed` truncates everything first, so it can be re-run or used to switch scale. The loader streams `COPY`, drops secondary indexes during the load and rebuilds them afterwards, switches the tables' own triggers off while it writes the totals they compute, then resets identity sequences and runs `ANALYZE` so `pg_stats` is populated. Foreign keys are checked throughout: the role an app gets may not skip them. The scale last seeded is recorded in `public.seed_info`.
+`db:seed` truncates everything first, so it can be re-run or used to switch scale. It keeps the `core.users` rows of the sign-in accounts, whose ids are theirs, and numbers its own users after them; an account without a row gets one from its first membership. The loader streams `COPY`, drops secondary indexes during the load and rebuilds them afterwards, switches the tables' own triggers off while it writes the totals they compute, then resets identity sequences and runs `ANALYZE` so `pg_stats` is populated. Foreign keys are checked throughout: the role an app gets may not skip them. The scale last seeded is recorded in `public.seed_info`.
 
 ## Layout
 

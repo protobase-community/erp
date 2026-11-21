@@ -28,7 +28,8 @@ than in this app, belongs in [Protobase's issues](https://github.com/PrototeamHQ
 5. Open a pull request that says what changed and why.
 
 Keep each pull request to one change. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org),
-such as `feat: filter the orders by status` or `fix: the seed's invoice totals`.
+such as `feat: filter the orders by status` or `fix: the seed's invoice totals`. A pull request lands as one squashed
+commit, so bring a branch up to date by merging `main` into it; the merge commit git writes for that is fine.
 
 ## Licence
 

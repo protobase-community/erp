@@ -7,6 +7,7 @@ import { seedLedger } from './steps/ledger'
 import { seedReference } from './steps/reference'
 import { seedSales } from './steps/sales'
 import { seedWarehouses } from './steps/warehouses'
+import { readAccounts, writeAccounts } from './accounts'
 import { analyzeAll, createIndexes, dropIndexes, resetSequences, setTriggers, truncateAll } from './maintenance'
 import { buildWorld } from './world'
 
@@ -21,18 +22,20 @@ const step = async (name: string, run: () => Promise<unknown>) => {
   console.log(`${name} (${((performance.now() - before) / 1000).toFixed(1)}s)`)
 }
 
-const world = buildWorld(scale)
-
 // One connection for the load, with the foreign keys checked: an app's own role may not skip them
 // (session_replication_role), only switch its triggers off. The generators are consistent by construction and
 // tests/examples/erp/smoke.test.ts checks the result.
 const loader = connect({ max: 1 })
+
+const accounts = await readAccounts(loader)
+const world = buildWorld(scale, accounts.firstUserId)
 
 await step('truncate', () => truncateAll(loader))
 const indexes = await dropIndexes(loader)
 await setTriggers(loader, false)
 try {
   await step('reference', () => seedReference(loader, world))
+  await step('accounts', () => writeAccounts(loader, accounts.rows))
   await step('crm', () => seedCrm(loader, world))
   await step('catalog', () => seedCatalog(loader, world))
   await step('hr', () => seedHr(loader, world))

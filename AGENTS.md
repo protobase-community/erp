@@ -22,4 +22,4 @@ exported from `config/index.ts`, over a Postgres database. Reference: https://do
 The platform runs `db:migrate` (the auth schema's migrations included), `typecheck`, `test` and `protobase doctor`, with
 their settings in the environment: keep them working. Run `typecheck` and `test` before you finish, and after a
 migration `db:migrate` and `db:doctor`, which fails on a list, filter or sort that no index serves. `db:seed:base` loads the reference data and organization 1 (in the auth schema too),
-and `db:seed` the sample data, replacing everything in the app's tables.
+and `db:seed` the sample data, replacing everything in the app's tables but the sign-in accounts' users.

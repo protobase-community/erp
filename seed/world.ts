@@ -16,13 +16,14 @@ const splitTotal = (total: number) => {
   return parts
 }
 
-// Every table's ids are allocated here, so builders can compute foreign keys without lookups.
-export const buildWorld = (name: ScaleName) => {
+// Every table's ids are allocated here, so builders can compute foreign keys without lookups. The users' start at
+// `firstUserId`, after the sign-in accounts' (./accounts.ts).
+export const buildWorld = (name: ScaleName, firstUserId: number) => {
   const scale = scales[name]
   const companies = splitTotal(scale.companies)
   const orders = splitTotal(scale.orders)
   const moves = splitTotal(scale.moves)
-  const next = { user: 1, company: 1, person: 1, tag: 1, category: 1, product: 1, order: 0, warehouse: 1, location: 1, move: 1, employee: 1 }
+  const next = { user: firstUserId, company: 1, person: 1, tag: 1, category: 1, product: 1, order: 0, warehouse: 1, location: 1, move: 1, employee: 1 }
 
   const orgs = orgSpecs.map((spec, index) => {
     const companyCount = companies[index]!

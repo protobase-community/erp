@@ -15,7 +15,7 @@ exported from `config/index.ts`, over a Postgres database. Reference: https://do
 ## Never touch
 
 - `auth/` and the `auth` schema: sign-in and accounts.
-- `.github/workflows/`.
+- `.github/workflows/`, unless the task asks for a CI change; that pull request then changes only CI.
 
 ## Scripts
 
